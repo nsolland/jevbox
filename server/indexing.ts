@@ -21,7 +21,7 @@ export type IndexPassage = {
   blockIds: string[];
 };
 export type ParsedDocument = {
-  source: "extend" | "text";
+  source: "valo" | "extend" | "text";
   pages: number;
   nodes: IndexNode[];
   blocks: ParsedBlock[];
@@ -228,7 +228,7 @@ const chunkSchema = z
   .passthrough();
 export function buildIndex(
   input: unknown,
-  source: "extend" | "text",
+  source: "valo" | "extend" | "text",
   outputMetadata?: unknown,
 ): ParsedDocument {
   const chunks = z.array(chunkSchema).min(1).parse(input);
