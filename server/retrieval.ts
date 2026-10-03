@@ -1,6 +1,7 @@
 import { createLimiter } from "./async";
 import { createTraversal, type RouteNode } from "./beam-search";
 import { createJev, retrievalLimits } from "./jev";
+import { createCaiRetrieval } from "./cai-retrieval";
 import {
   HttpError,
   type Actor,
@@ -64,11 +65,6 @@ export async function retrieveDocuments(
     permissionCache?: PermissionCache;
   },
 ) {
-  if (!key)
-    throw new HttpError(
-      409,
-      "Connect TypeSafe in organization settings to enable search.",
-    );
   signal?.throwIfAborted();
   const canRead = createResourceAccessReader(
     store,
@@ -432,12 +428,12 @@ export async function retrieveDocuments(
   }
   const traversal = createTraversal(
     bounded(roots, "library"),
-    createJev(key, fetcher, signal),
+    key ? createJev(key, fetcher, signal) : createCaiRetrieval(),
     query,
     (node) => Boolean(node.value?.sources.length),
     options?.recoverRoutes ?? true,
   );
-  const jev = createJev(key, fetcher, signal);
+  const jev = key ? createJev(key, fetcher, signal) : createCaiRetrieval();
   const results: RetrievedSource[] = [];
   const trace: RetrievalStep[] = [];
   const candidates: Omit<RetrievedSource, "score">[] = [];
