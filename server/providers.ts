@@ -10,6 +10,7 @@ import { PermanentJobError } from "./jobs";
 import { buildIndex } from "./indexing";
 import { retrieveDocuments } from "./retrieval";
 import { jsonRequest } from "./provider-http";
+import { parseWithValo, valoParserConfigured } from "./valo-parser";
 import type { SearchFilters } from "../shared/search-filters";
 import { documentAnswerPolicy } from "./answer-policy";
 import {
@@ -94,6 +95,18 @@ export function createProviders(store: Store, fetcher: Fetch = fetch) {
           })),
           "text",
         );
+    }
+    if (valoParserConfigured()) {
+      return parseWithValo(
+        {
+          id: document.id,
+          name: document.name,
+          mime: document.mime,
+          body: new Uint8Array(body),
+        },
+        request,
+        execution?.signal,
+      );
     }
     if (!settings.extendKey) {
       await checkpoint(
