@@ -1,0 +1,89 @@
+VALO DOCUMENT HUB INTEGRATION
+
+Primary objective
+
+Turn this fork into VALO's canonical document, report, and evidence hub while retaining Jevbox's useful library, source viewer, permissions, citations, API/MCP, storage, and durable job architecture.
+
+Ownership
+
+Repository: nsolland/jevbox
+Canonical base SHA: 7e4562124c49d0e6a527609e872b7627e00ef604
+Branch: feat/valo-document-hub
+Owner: VALO / Njål
+Owned scope: parser adapters, retrieval adapters, CAI integration, canonical evidence/provenance model, associated tests and configuration.
+Dependency boundary: public HEIMEL is frozen and is not part of this work.
+
+Required architecture
+
+1. First-party parser
+
+Parsing must be provider-pluggable. VALO's own AI parser is the preferred/default parser. Extend becomes an optional adapter/fallback, not required infrastructure.
+
+The canonical parse contract must preserve:
+- original source artifact and version
+- pages and source coordinates
+- document/section hierarchy
+- extracted blocks/passages
+- parser identity and version
+- lineage from every derived object back to the source
+
+Existing local parsing for text, code, JSON, HTML, and CSV should remain available. PDF, Office, image, and scanned-document support must work through the first-party parser. Stirling PDF may be added as a local PDF utility/parser adapter where useful.
+
+2. CAI
+
+CAI is an intelligence and retrieval layer over the canonical corpus. It consumes canonical parsed structure and source passages, searches and reasons over documents, and returns evidence references.
+
+CAI output is derived representation. It never replaces the source evidence.
+
+The corpus and evidence references remain available through REST and MCP so other VALO systems and agents can use the same document substrate.
+
+3. Retrieval
+
+The current TypeSafe/JEV dependency must sit behind a retrieval interface. VALO/CAI retrieval must work without a TypeSafe API key.
+
+Preserve hierarchical retrieval where useful:
+
+category -> document -> section -> source passage
+
+Embeddings, summaries, classifications, labels, generated metadata, and search indexes are disposable/rebuildable representations. They are not authoritative evidence.
+
+4. Evidence and provenance
+
+The original artifact is immutable evidence.
+
+Every parse, OCR result, extracted structure, passage, embedding, classification, summary, retrieval result, and model answer retains lineage to:
+- exact source artifact/version
+- exact parser/transform
+- source page/section/coordinates when available
+
+Citations must resolve to the corresponding original evidence location.
+
+Re-parsing or re-indexing creates a new derived version and must not silently overwrite provenance.
+
+5. Scope
+
+This hub is shared VALO infrastructure for:
+- research reports and papers
+- experiment artifacts and raw evidence
+- regulatory and standards material
+- partner/customer documents
+- internal knowledge
+- generated reports with source lineage
+
+Keep REST and MCP first-class.
+
+Do not couple this work to public HEIMEL.
+
+Acceptance
+
+A document can be uploaded, parsed by the VALO parser, indexed without Extend or TypeSafe credentials, queried through CAI, and answered with citations resolving to the original source.
+
+Provider adapters can be switched without changing the canonical document/evidence model.
+
+Tests cover provenance across upload -> parse -> index -> retrieval -> citation.
+
+Existing Jevbox library, browser, permissions, source viewing, storage, and durable jobs remain functional.
+
+Non-goal
+
+Do not rewrite working Jevbox UI, authentication, permissions, storage, or job infrastructure unless the integration requires it.
